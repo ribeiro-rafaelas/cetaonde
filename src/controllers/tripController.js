@@ -1,4 +1,6 @@
 const TripModel = require('../models/tripModel');
+const AlbumModel = require('../models/albumModel');
+const PhotoModel = require('../models/photoModel');
 
 const normalizePayload = (payload = {}) => ({
   destination: payload.destination?.trim(),
@@ -45,7 +47,7 @@ const TripController = {
   async listTrips(req, res, next) {
     try {
       const trips = await TripModel.findAll();
-      res.render('index', { trips });
+      res.render('index', { trips, spotlightAlbum: trips[0]?.coverPhotoPath || null });
     } catch (error) {
       next(error);
     }
@@ -58,7 +60,25 @@ const TripController = {
         res.status(404).render('404');
         return;
       }
-      res.render('trip_details', { trip });
+
+      const albums = await AlbumModel.findByTripId(trip.id);
+      const albumIds = albums.map((album) => album.id);
+      const photos = await PhotoModel.findByAlbumIds(albumIds);
+
+      const photosGrouped = photos.reduce((acc, photo) => {
+        if (!acc[photo.albumId]) {
+          acc[photo.albumId] = [];
+        }
+        acc[photo.albumId].push(photo);
+        return acc;
+      }, {});
+
+      const albumsWithPhotos = albums.map((album) => ({
+        ...album,
+        photos: photosGrouped[album.id] || []
+      }));
+
+      res.render('trip_details', { trip, albums: albumsWithPhotos });
     } catch (error) {
       next(error);
     }

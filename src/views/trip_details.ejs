@@ -1,131 +1,261 @@
 <%- include('partials/header') %>
 
-<section>
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-    <div>
-      <h1 class="h3 mb-1"><%= trip.destination %></h1>
-      <p class="text-muted mb-0"><%= trip.country %></p>
-    </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="/">Voltar</a>
-      <button class="btn btn-danger delete-trip-btn" data-trip-id="<%= trip.id %>">
-        Excluir viagem
-      </button>
+<% const heroCover = trip.coverPhotoPath || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80'; %>
+
+<section class="trip-hero card border-0 shadow-sm overflow-hidden mb-4 position-relative">
+  <div
+    class="trip-hero__backdrop position-absolute top-0 start-0 w-100 h-100"
+    style="background-image: linear-gradient(135deg, rgba(16, 65, 38, 0.85), rgba(3, 26, 64, 0.85)), url('<%= heroCover %>');"
+  ></div>
+  <div class="trip-hero__content position-relative text-white p-4 p-md-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+      <div>
+        <span class="badge bg-success bg-opacity-75 text-uppercase mb-3">Exploracao ao ar livre</span>
+        <h1 class="display-6 fw-semibold mb-1" id="trip-destination"><%= trip.destination %></h1>
+        <p class="lead mb-3 text-white-50" id="trip-country"><%= trip.country %></p>
+        <p class="mb-0 trip-period">
+          <i class="bi bi-calendar-week me-2"></i>
+          <span id="trip-period">
+            <%= new Date(trip.startDate).toLocaleDateString('pt-BR') %> ate
+            <%= new Date(trip.endDate).toLocaleDateString('pt-BR') %>
+          </span>
+        </p>
+      </div>
+      <div class="d-flex flex-column flex-sm-row gap-2">
+        <a class="btn btn-outline-light" href="/">Voltar para minhas viagens</a>
+        <button class="btn btn-danger delete-trip-btn" data-trip-id="<%= trip.id %>">
+          <i class="bi bi-trash me-2"></i>Excluir viagem
+        </button>
+      </div>
     </div>
   </div>
+</section>
 
-  <div class="row g-4">
-    <div class="col-lg-7">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Resumo</h2>
-          <dl class="row mb-0">
-            <dt class="col-sm-4">Destino</dt>
-            <dd class="col-sm-8" id="trip-destination"><%= trip.destination %></dd>
+<section class="row g-4 align-items-stretch mb-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Resumo da experiencia</h2>
+        <p class="text-muted mb-4">
+          Relembre momentos especiais desta jornada rodeada por natureza exuberante e paisagens inesqueciveis.
+        </p>
+        <dl class="row mb-0 gy-3">
+          <dt class="col-sm-4">Destino</dt>
+          <dd class="col-sm-8" id="trip-summary-destination"><%= trip.destination %></dd>
 
-            <dt class="col-sm-4">País</dt>
-            <dd class="col-sm-8" id="trip-country"><%= trip.country %></dd>
+          <dt class="col-sm-4">Pais</dt>
+          <dd class="col-sm-8" id="trip-summary-country"><%= trip.country %></dd>
 
-            <dt class="col-sm-4">Período</dt>
-            <dd class="col-sm-8" id="trip-period">
-              <%= new Date(trip.startDate).toLocaleDateString('pt-BR') %>
-              até
-              <%= new Date(trip.endDate).toLocaleDateString('pt-BR') %>
-            </dd>
-
-            <dt class="col-sm-4">Notas</dt>
-            <dd class="col-sm-8" id="trip-notes">
-              <% if (trip.notes) { %>
-                <%= trip.notes %>
-              <% } else { %>
-                <span class="text-muted">Sem anotações adicionais.</span>
-              <% } %>
-            </dd>
-          </dl>
-        </div>
+          <dt class="col-sm-4">Notas</dt>
+          <dd class="col-sm-8" id="trip-notes">
+            <% if (trip.notes) { %>
+              <%= trip.notes %>
+            <% } else { %>
+              <span class="text-muted">Sem anotacoes adicionais.</span>
+            <% } %>
+          </dd>
+        </dl>
       </div>
-
       <div
         id="trip-map"
-        class="map-wrapper"
+        class="map-wrapper rounded-bottom"
         data-country="<%= trip.country %>"
         data-destination="<%= trip.destination %>"
       ></div>
     </div>
+  </div>
 
-    <div class="col-lg-5">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Editar viagem</h2>
-          <div id="edit-feedback" class="mb-3 d-none alert" role="alert"></div>
-          <form id="edit-trip-form" data-trip-id="<%= trip.id %>" novalidate>
-            <div class="mb-3">
-              <label for="edit_destination" class="form-label">Destino</label>
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Atualizar detalhes</h2>
+        <p class="text-muted mb-4">
+          Ajuste informacoes importantes da viagem para manter seu diario de exploracao sempre atualizado.
+        </p>
+        <div id="edit-feedback" class="mb-3 d-none alert" role="alert"></div>
+        <form id="edit-trip-form" data-trip-id="<%= trip.id %>" novalidate>
+          <div class="mb-3">
+            <label for="edit_destination" class="form-label">Destino</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit_destination"
+              name="destination"
+              value="<%= trip.destination %>"
+              required
+            />
+            <div class="invalid-feedback">Informe o destino.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="edit_country" class="form-label">Pais</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit_country"
+              name="country"
+              value="<%= trip.country %>"
+              required
+            />
+            <div class="invalid-feedback">Informe o pais.</div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="edit_start_date" class="form-label">Data de inicio</label>
               <input
-                type="text"
+                type="date"
                 class="form-control"
-                id="edit_destination"
-                name="destination"
-                value="<%= trip.destination %>"
+                id="edit_start_date"
+                name="start_date"
+                value="<%= trip.startDate ? trip.startDate.toISOString ? trip.startDate.toISOString().slice(0, 10) : trip.startDate : '' %>"
                 required
               />
-              <div class="invalid-feedback">Informe o destino.</div>
+              <div class="invalid-feedback">Informe a data de inicio.</div>
             </div>
-
-            <div class="mb-3">
-              <label for="edit_country" class="form-label">País</label>
+            <div class="col-md-6">
+              <label for="edit_end_date" class="form-label">Data de termino</label>
               <input
-                type="text"
+                type="date"
                 class="form-control"
-                id="edit_country"
-                name="country"
-                value="<%= trip.country %>"
+                id="edit_end_date"
+                name="end_date"
+                value="<%= trip.endDate ? trip.endDate.toISOString ? trip.endDate.toISOString().slice(0, 10) : trip.endDate : '' %>"
                 required
               />
-              <div class="invalid-feedback">Informe o país.</div>
+              <div class="invalid-feedback">Informe a data de termino.</div>
             </div>
+          </div>
 
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="edit_start_date" class="form-label">Data de início</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="edit_start_date"
-                  name="start_date"
-                  value="<%= trip.startDate ? trip.startDate.toISOString ? trip.startDate.toISOString().slice(0, 10) : trip.startDate : '' %>"
-                  required
-                />
-                <div class="invalid-feedback">Informe a data de início.</div>
-              </div>
-              <div class="col-md-6">
-                <label for="edit_end_date" class="form-label">Data de término</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="edit_end_date"
-                  name="end_date"
-                  value="<%= trip.endDate ? trip.endDate.toISOString ? trip.endDate.toISOString().slice(0, 10) : trip.endDate : '' %>"
-                  required
-                />
-                <div class="invalid-feedback">Informe a data de término.</div>
-              </div>
-            </div>
+          <div class="mb-3 mt-3">
+            <label for="edit_notes" class="form-label">Anotacoes da viagem</label>
+            <textarea class="form-control" id="edit_notes" name="notes" rows="4"><%= trip.notes || '' %></textarea>
+          </div>
 
-            <div class="mb-3 mt-3">
-              <label for="edit_notes" class="form-label">Anotações</label>
-              <textarea
-                class="form-control"
-                id="edit_notes"
-                name="notes"
-                rows="4"
-              ><%= trip.notes || '' %></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Salvar alterações</button>
-          </form>
-        </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-save me-2"></i>Salvar alteracoes
+          </button>
+        </form>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="card shadow-sm border-0 mb-5">
+  <div class="card-body p-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+      <div>
+        <h2 class="h5 mb-1">Albuns e memorias</h2>
+        <p class="text-muted mb-0">Crie colecoes tematicas e registre as paisagens que marcaram esta viagem.</p>
+      </div>
+      <button
+        class="btn btn-outline-primary"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#new-album-collapse"
+        aria-expanded="false"
+        aria-controls="new-album-collapse"
+      >
+        <i class="bi bi-image me-2"></i>Novo album
+      </button>
+    </div>
+
+    <div class="collapse mb-4" id="new-album-collapse">
+      <form
+        id="new-album-form"
+        action="/trip/<%= trip.id %>/albums"
+        method="post"
+        data-trip-id="<%= trip.id %>"
+        class="row g-3"
+      >
+        <div class="col-md-6">
+          <label for="album-title" class="form-label">Titulo do album</label>
+          <input type="text" class="form-control" id="album-title" name="title" required />
+          <div class="invalid-feedback">Informe um titulo.</div>
+        </div>
+        <div class="col-md-6">
+          <label for="album-description" class="form-label">Descricao</label>
+          <input type="text" class="form-control" id="album-description" name="description" />
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Criar album
+          </button>
+        </div>
+      </form>
+      <div class="alert alert-danger mt-3 d-none" id="album-feedback"></div>
+    </div>
+
+    <div id="album-grid" class="row g-4">
+      <% if (!albums || !albums.length) { %>
+        <div class="col-12">
+          <div class="alert alert-info mb-0">
+            Nenhum album criado ainda. Comece registrando as primeiras lembrancas desta jornada.
+          </div>
+        </div>
+      <% } else { %>
+        <% albums.forEach((album) => { %>
+          <div class="col-12 col-md-6" data-album-id="<%= album.id %>">
+            <div class="card album-card h-100 border-0 shadow-sm">
+              <div class="album-cover position-relative overflow-hidden">
+                <% if (album.coverPhotoPath) { %>
+                  <img src="<%= album.coverPhotoPath %>" class="w-100 h-100 object-fit-cover" alt="Capa do album <%= album.title %>" />
+                <% } else { %>
+                  <div class="album-cover__placeholder d-flex flex-column align-items-center justify-content-center h-100 text-center text-white">
+                    <i class="bi bi-images display-6 mb-2"></i>
+                    <p class="mb-0 small">Adicione a primeira foto para revelar a natureza deste album.</p>
+                  </div>
+                <% } %>
+              </div>
+              <div class="card-body">
+                <h3 class="h6 mb-1"><%= album.title %></h3>
+                <p class="text-muted small mb-3"><%= album.description || 'Sem descricao cadastrada.' %></p>
+                <div class="album-photos-grid mb-3" data-empty-text="Nenhuma foto adicionada ainda.">
+                  <% if (album.photos && album.photos.length) { %>
+                    <% album.photos.forEach((photo) => { %>
+                      <figure class="photo-thumb">
+                        <img src="<%= photo.filePath %>" alt="<%= photo.caption || 'Foto da viagem' %>" />
+                        <% if (photo.caption) { %>
+                          <figcaption><%= photo.caption %></figcaption>
+                        <% } %>
+                      </figure>
+                    <% }) %>
+                  <% } else { %>
+                    <p class="text-muted small mb-0">Nenhuma foto adicionada ainda.</p>
+                  <% } %>
+                </div>
+                <form
+                  class="photo-upload-form needs-validation"
+                  action="/trip/<%= trip.id %>/albums/<%= album.id %>/photos"
+                  method="post"
+                  data-trip-id="<%= trip.id %>"
+                  data-album-id="<%= album.id %>"
+                  enctype="multipart/form-data"
+                  novalidate
+                >
+                  <div class="mb-2">
+                    <label class="form-label">Adicionar foto</label>
+                    <input type="file" name="photo" accept="image/*" class="form-control" required />
+                    <div class="invalid-feedback">Selecione uma imagem no formato JPG, PNG, WEBP ou GIF.</div>
+                  </div>
+                  <div class="mb-3">
+                    <input
+                      type="text"
+                      name="caption"
+                      class="form-control"
+                      placeholder="Legenda (opcional)"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-cloud-upload me-1"></i>Enviar foto
+                  </button>
+                  <div class="upload-feedback small mt-2 text-danger d-none"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
     </div>
   </div>
 </section>

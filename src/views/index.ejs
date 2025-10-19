@@ -1,51 +1,100 @@
 <%- include('partials/header') %>
 
+<% const heroImage = spotlightAlbum || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'; %>
+
+<section class="landing-hero card border-0 shadow-sm overflow-hidden mb-5 position-relative">
+  <div
+    class="landing-hero__backdrop position-absolute top-0 start-0 w-100 h-100"
+    style="background-image: linear-gradient(135deg, rgba(13, 80, 58, 0.85), rgba(4, 41, 84, 0.85)), url('<%= heroImage %>');"
+  ></div>
+  <div class="landing-hero__content position-relative text-white p-4 p-md-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge bg-success bg-opacity-75 text-uppercase mb-3">Natureza e viagem</span>
+        <h1 class="display-6 fw-semibold mb-3">Crie um diario vibrante das suas expedicoes</h1>
+        <p class="lead mb-4 text-white-50">
+          Centralize roteiros, lembrancas e agora tambem as fotografias de cada caminho percorrido pelo mundo.
+        </p>
+        <a class="btn btn-light btn-lg" href="/trip/new">
+          <i class="bi bi-compass me-2"></i>Registrar nova aventura
+        </a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-stats d-flex flex-column gap-3">
+          <div class="hero-stat-card">
+            <strong class="fs-4"><%= trips?.length || 0 %></strong>
+            <span>Viagens catalogadas</span>
+          </div>
+          <div class="hero-stat-card">
+            <strong class="fs-4">Albuns tematicos</strong>
+            <span>Organize suas fotos por trilhas, cidades ou momentos especiais.</span>
+          </div>
+          <div class="hero-stat-card">
+            <strong class="fs-4">Memorias verdes</strong>
+            <span>O visual do app celebra a energia de destinos naturais.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-      <h1 class="h2 mb-1">Minhas viagens</h1>
-      <p class="text-muted mb-0">Gerencie seus registros de viagem em um só lugar.</p>
+      <h2 class="h4 mb-1">Minhas viagens</h2>
+      <p class="text-muted mb-0">Gerencie roteiros, notas e albuns das suas experiencias pela natureza.</p>
     </div>
-    <a class="btn btn-primary" href="/trip/new">Adicionar viagem</a>
+    <a class="btn btn-primary" href="/trip/new">
+      <i class="bi bi-plus-circle me-2"></i>Adicionar viagem
+    </a>
   </div>
 
   <% if (!trips || trips.length === 0) { %>
     <div class="alert alert-info">Nenhuma viagem cadastrada ainda. Adicione sua primeira viagem!</div>
   <% } else { %>
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
       <% trips.forEach((trip) => { %>
         <div class="col">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title mb-2">
-                <span class="fw-semibold"><%= trip.destination %></span>
-                <small class="text-muted">— <%= trip.country %></small>
-              </h5>
-              <p class="card-text mb-2">
-                <strong>Período:</strong>
-                <%= new Date(trip.startDate).toLocaleDateString('pt-BR') %>
-                até
-                <%= new Date(trip.endDate).toLocaleDateString('pt-BR') %>
-              </p>
-              <% if (trip.notes) { %>
-                <p class="card-text flex-grow-1"><%= trip.notes %></p>
+          <article class="trip-card card h-100 border-0 shadow-sm overflow-hidden">
+            <div class="trip-card__cover">
+              <% if (trip.coverPhotoPath) { %>
+                <img src="<%= trip.coverPhotoPath %>" alt="Paisagem de <%= trip.destination %>" class="w-100 h-100 object-fit-cover" />
               <% } else { %>
-                <p class="card-text text-muted flex-grow-1">Sem anotações adicionais.</p>
+                <div class="trip-card__cover-gradient d-flex flex-column justify-content-center align-items-center text-white text-center h-100">
+                  <i class="bi bi-camera mb-2 display-6"></i>
+                  <p class="mb-0 small">Crie um album para revelar as memorias visuais desta viagem.</p>
+                </div>
               <% } %>
-              <div class="mt-3 d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/trip/<%= trip.id %>">Detalhes</a>
-                <button
-                  class="btn btn-outline-danger btn-sm delete-trip-btn"
-                  data-trip-id="<%= trip.id %>"
-                >
-                  Excluir
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h3 class="h5 mb-1"><%= trip.destination %></h3>
+              <p class="text-muted mb-3"><i class="bi bi-geo-alt me-1"></i><%= trip.country %></p>
+              <div class="trip-date badge bg-light text-success-emphasis w-auto align-self-start mb-3">
+                <i class="bi bi-calendar3 me-1"></i>
+                <%= new Date(trip.startDate).toLocaleDateString('pt-BR') %> ate
+                <%= new Date(trip.endDate).toLocaleDateString('pt-BR') %>
+              </div>
+              <p class="text-muted flex-grow-1">
+                <% if (trip.notes) { %>
+                  <%= trip.notes.length > 120 ? trip.notes.slice(0, 117) + '...' : trip.notes %>
+                <% } else { %>
+                  Sem anotacoes adicionais.
+                <% } %>
+              </p>
+              <div class="mt-3 d-flex gap-2 flex-wrap">
+                <a class="btn btn-success btn-sm" href="/trip/<%= trip.id %>">
+                  <i class="bi bi-journal-richtext me-1"></i>Detalhes
+                </a>
+                <button class="btn btn-outline-danger btn-sm delete-trip-btn" data-trip-id="<%= trip.id %>">
+                  <i class="bi bi-trash"></i>
                 </button>
               </div>
             </div>
-            <div class="card-footer text-muted small">
+            <div class="card-footer bg-transparent border-0 text-muted small">
               Registrado em <%= new Date(trip.createdAt).toLocaleDateString('pt-BR') %>
             </div>
-          </div>
+          </article>
         </div>
       <% }) %>
     </div>
