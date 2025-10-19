@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+
+<section>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1"><%= trip.destination %></h1>
+      <p class="text-muted mb-0"><%= trip.country %></p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/">Voltar</a>
+      <button class="btn btn-danger delete-trip-btn" data-trip-id="<%= trip.id %>">
+        Excluir viagem
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Resumo</h2>
+          <dl class="row mb-0">
+            <dt class="col-sm-4">Destino</dt>
+            <dd class="col-sm-8" id="trip-destination"><%= trip.destination %></dd>
+
+            <dt class="col-sm-4">País</dt>
+            <dd class="col-sm-8" id="trip-country"><%= trip.country %></dd>
+
+            <dt class="col-sm-4">Período</dt>
+            <dd class="col-sm-8" id="trip-period">
+              <%= new Date(trip.startDate).toLocaleDateString('pt-BR') %>
+              até
+              <%= new Date(trip.endDate).toLocaleDateString('pt-BR') %>
+            </dd>
+
+            <dt class="col-sm-4">Notas</dt>
+            <dd class="col-sm-8" id="trip-notes">
+              <% if (trip.notes) { %>
+                <%= trip.notes %>
+              <% } else { %>
+                <span class="text-muted">Sem anotações adicionais.</span>
+              <% } %>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div
+        id="trip-map"
+        class="map-wrapper"
+        data-country="<%= trip.country %>"
+        data-destination="<%= trip.destination %>"
+      ></div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Editar viagem</h2>
+          <div id="edit-feedback" class="mb-3 d-none alert" role="alert"></div>
+          <form id="edit-trip-form" data-trip-id="<%= trip.id %>" novalidate>
+            <div class="mb-3">
+              <label for="edit_destination" class="form-label">Destino</label>
+              <input
+                type="text"
+                class="form-control"
+                id="edit_destination"
+                name="destination"
+                value="<%= trip.destination %>"
+                required
+              />
+              <div class="invalid-feedback">Informe o destino.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="edit_country" class="form-label">País</label>
+              <input
+                type="text"
+                class="form-control"
+                id="edit_country"
+                name="country"
+                value="<%= trip.country %>"
+                required
+              />
+              <div class="invalid-feedback">Informe o país.</div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="edit_start_date" class="form-label">Data de início</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="edit_start_date"
+                  name="start_date"
+                  value="<%= trip.startDate ? trip.startDate.toISOString ? trip.startDate.toISOString().slice(0, 10) : trip.startDate : '' %>"
+                  required
+                />
+                <div class="invalid-feedback">Informe a data de início.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="edit_end_date" class="form-label">Data de término</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="edit_end_date"
+                  name="end_date"
+                  value="<%= trip.endDate ? trip.endDate.toISOString ? trip.endDate.toISOString().slice(0, 10) : trip.endDate : '' %>"
+                  required
+                />
+                <div class="invalid-feedback">Informe a data de término.</div>
+              </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+              <label for="edit_notes" class="form-label">Anotações</label>
+              <textarea
+                class="form-control"
+                id="edit_notes"
+                name="notes"
+                rows="4"
+              ><%= trip.notes || '' %></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Salvar alterações</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,15 @@
+body {
+  background-color: #f8fafc;
+}
+
+.map-wrapper {
+  height: 360px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.15);
+}
+
+.map-wrapper .leaflet-container {
+  height: 100%;
+  width: 100%;
+}

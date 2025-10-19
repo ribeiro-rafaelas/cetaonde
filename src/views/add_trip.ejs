@@ -1,0 +1,88 @@
+<%- include('partials/header') %>
+
+<section class="mx-auto" style="max-width: 720px;">
+  <h1 class="h3 mb-4">Adicionar nova viagem</h1>
+
+  <% if (errors && errors.length) { %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% errors.forEach((error) => { %>
+          <li><%= error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <form id="trip-form" action="/trip" method="POST" novalidate>
+    <div class="mb-3">
+      <label for="destination" class="form-label">Destino</label>
+      <input
+        type="text"
+        class="form-control"
+        id="destination"
+        name="destination"
+        value="<%= formData?.destination || '' %>"
+        required
+      />
+      <div class="invalid-feedback">Informe o destino da viagem.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="country" class="form-label">País</label>
+      <input
+        type="text"
+        class="form-control"
+        id="country"
+        name="country"
+        value="<%= formData?.country || '' %>"
+        required
+      />
+      <div class="invalid-feedback">Informe o país da viagem.</div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="start_date" class="form-label">Data de início</label>
+        <input
+          type="date"
+          class="form-control"
+          id="start_date"
+          name="start_date"
+          value="<%= formData?.startDate ? formData.startDate.slice(0, 10) : '' %>"
+          required
+        />
+        <div class="invalid-feedback">Informe a data de início.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="end_date" class="form-label">Data de término</label>
+        <input
+          type="date"
+          class="form-control"
+          id="end_date"
+          name="end_date"
+          value="<%= formData?.endDate ? formData.endDate.slice(0, 10) : '' %>"
+          required
+        />
+        <div class="invalid-feedback">Informe a data de término.</div>
+      </div>
+    </div>
+
+    <div class="mb-3 mt-3">
+      <label for="notes" class="form-label">Anotações</label>
+      <textarea
+        class="form-control"
+        id="notes"
+        name="notes"
+        rows="4"
+        placeholder="Insira observações importantes, dicas ou memórias."
+      ><%= formData?.notes || '' %></textarea>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Salvar viagem</button>
+      <a href="/" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+
+<%- include('partials/footer') %>
